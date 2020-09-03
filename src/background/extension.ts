@@ -207,11 +207,11 @@ export class Extension {
 
     private getConnectionMessage(url, frameURL) {
         if (this.ready) {
-            return this.isEnabled() && this.getTabMessage(url, frameURL);
+            return this.getTabMessage(url, frameURL);
         } else {
             return new Promise((resolve) => {
                 this.awaiting.push(() => {
-                    resolve(this.isEnabled() && this.getTabMessage(url, frameURL));
+                    resolve(this.getTabMessage(url, frameURL));
                 });
             });
         }
@@ -364,7 +364,7 @@ export class Extension {
     private getURLInfo(url: string): TabInfo {
         const {DARK_SITES} = this.config;
         const isInDarkList = isURLInList(url, DARK_SITES);
-        const isProtected = !(this.user.settings.enableForProtectedPages || canInjectScript(url));
+        const isProtected = !canInjectScript(url);
         return {
             url,
             isInDarkList,
@@ -425,9 +425,9 @@ export class Extension {
                     throw new Error(`Unknown engine ${theme.engine}`);
                 }
             }
-        } else {
-            console.log(`Site is not inverted: ${url}`);
         }
+
+        console.log(`Site is not inverted: ${url}`);
         return {
             type: 'clean-up',
         };
